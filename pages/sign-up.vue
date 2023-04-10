@@ -167,7 +167,7 @@ watch(nickname, () => {
                 </button>
             </div>
             <div v-else class="mb-3">
-                <input v-if="btn_enabled" @click="create_user" type="submit" class="btn btn-success" value="Sign up">
+                <input v-if="btn_enabled" type="submit" class="btn btn-success" value="Sign up">
                 <button v-else type="button" class="btn btn-outline-success" disabled>Sign up</button>
             </div>
 

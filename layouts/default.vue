@@ -5,7 +5,6 @@
             <div id="main" data-bs-theme="dark">
                 <slot />
             </div>
-            <Footer />
         </div>
     </div>
 </template>

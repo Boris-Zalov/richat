@@ -7,6 +7,7 @@ const supabase = useSupabaseClient()
 const { data, error } = await supabase
     .from('posts')
     .select('id')
+    .order('created_at', { ascending: false })
 
 loaded.value = true
 </script>
