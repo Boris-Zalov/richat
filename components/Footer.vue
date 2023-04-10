@@ -1,5 +1,5 @@
 <template>
-    <footer class="sticky-bottom bg-dark">
+    <footer class="fixed-bottom bg-dark">
         <div class="text-center">
             <small>Copyright &copy; Richat</small>
         </div>

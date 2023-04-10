@@ -5,6 +5,7 @@ const { path } = toRefs(props)
 const emit = defineEmits(['update:path', 'upload'])
 
 const supabase = useSupabaseClient()
+const user = useSupabaseUser()
 
 const uploading = ref(false)
 const src = ref('')
@@ -38,10 +39,25 @@ const uploadAvatar = async (evt) => {
 
     if (uploadError) throw uploadError
 
+    const updates = {
+      id: user.value.id,
+      username: user.value.value,
+      website: user.value.value,
+      avatar_url: filePath,
+      updated_at: new Date(),
+    }
+
+    let { error } = await supabase.from('profiles').upsert(updates, {
+      returning: 'minimal', // Don't return the value after inserting
+    })
+
+    if (error) throw error
+
     emit('update:path', filePath)
     emit('upload')
   } catch (error) {
     alert(error.message)
+    console.log(error)
   } finally {
     uploading.value = false
   }
@@ -58,27 +74,15 @@ watch(path, () => {
 
 <template>
   <div>
-    <img
-      v-if="src"
-      :src="src"
-      alt="Avatar"
-      class="avatar image"
-      style="width: 10em; height: 10em;"
-    />
+    <img v-if="src" :src="src" alt="Avatar" class="avatar image" style="width: 10em; height: 10em;" />
     <div v-else class="avatar no-image" :style="{ height: size, width: size }" />
 
     <div style="width: 10em; position: relative;">
       <label class="button primary block" for="single">
         {{ uploading ? 'Uploading ...' : 'Upload' }}
       </label>
-      <input
-        style="position: absolute; visibility: hidden;"
-        type="file"
-        id="single"
-        accept="image/*"
-        @change="uploadAvatar"
-        :disabled="uploading"
-      />
+      <input style="position: absolute; visibility: hidden;" type="file" id="single" accept="image/*"
+        @change="uploadAvatar" :disabled="uploading" />
     </div>
   </div>
 </template>

@@ -1,13 +1,12 @@
 <template>
-    <div class="container-fluid bg-dark" data-bs-theme="dark" id="page-content">
-        <div class="container mt-5">
+    <div id="bg" class="bg-dark">
+        <div class="container-md mt-5 bg-dark" data-bs-theme="dark" id="page-content">
             <Navbar />
-            <div id="main">
+            <div id="main" data-bs-theme="dark">
                 <slot />
             </div>
             <Footer />
         </div>
-
     </div>
 </template>
 
@@ -17,18 +16,32 @@ html {
 }
 
 body {
-    background-color: black;
-    color: white;
+    height: 100%;
+    color: white !important;
+}
+
+#__nuxt {
+    height: 100%;
+}
+
+#bg {
+    min-height: 100%;
+    height: auto;
+}
+
+#page-content {
     height: 100%;
 }
 
 #main {
+    min-height: 100%;
+    height: auto;
     padding-top: 40px;
 }
 
 .page-enter-active,
 .page-leave-active {
-    transition: all 0.2s;
+    transition: all 0.3s;
 }
 
 .page-enter-from,

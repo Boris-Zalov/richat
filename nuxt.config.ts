@@ -12,10 +12,6 @@ export default defineNuxtConfig({
         {
           src: '/js/bootstrap.bundle.min.js',
           type: "text/javascript"
-        },
-        {
-          src: '/js/navbar_active.js',
-          type: "text/javascript"
         }
       ],
       charset: 'utf-8',
@@ -31,6 +27,9 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: ['@nuxtjs/supabase'],
+  modules: [
+    '@nuxtjs/supabase',
+    '@nuxt/image-edge'
+  ],
 
 })

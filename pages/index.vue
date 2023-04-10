@@ -1,26 +1,30 @@
 <script setup>
-let cards = ref([])
-for (let i = 0; i < 30; i++) {
-    cards.value.push({ id: i });
-} 
+let loaded = ref(false)
 
+const user = useSupabaseUser()
+const supabase = useSupabaseClient()
+
+const { data, error } = await supabase
+    .from('posts')
+    .select('id')
+
+loaded.value = true
 </script>
 
 <template>
     <div>
-        <div>
-            Home page
-        </div>
-        <div v-for="card in cards" :key="card.id" class="card mt-5 mx-auto p-2" style="width: 70%;">
-            <div class="card-body" style="width:300px">
-                <h5 class="card-title">Card title</h5>
-                <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-                    content.</p>
-                <a href="#" class="card-link">Card link</a>
-                <a href="#" class="card-link">Another link</a>
+        <div v-if="loaded">
+            <h1>
+                Home page
+            </h1>
+            <div v-for="post in data" :key="post.id">
+                <LazyPost :id="post.id" />
             </div>
-
+        </div>
+        <div v-else class="text-center">
+            <div class="spinner-border" role="status" style="width: 30rem; height: 30rem;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
         </div>
     </div>
 </template>
