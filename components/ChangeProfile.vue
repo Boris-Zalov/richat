@@ -2,9 +2,12 @@
 const supabase = useSupabaseClient()
 
 const loading = ref(true)
+let loaded = ref(false)
 
 const nickname = ref('')
-const avatar_url = ref('')
+const files = ref('')
+
+let nickname_valid_state = ref("")
 
 const btn_enabled = ref(true)
 
@@ -13,13 +16,12 @@ const user = useSupabaseUser()
 
 let { data } = await supabase
     .from('users')
-    .select(`nickname, avatar_url`)
+    .select(`nickname`)
     .eq('id', user.value.id)
     .single()
 
 if (data) {
     nickname.value = data.nickname
-    avatar_url.value = data.avatar_url
 }
 
 loading.value = false
@@ -29,24 +31,84 @@ async function update_profile() {
         loading.value = true
         const user = useSupabaseUser()
 
+        try {
+            if (files.value) {
+                const file = files.value[0]
+                const fileExt = file.name.split('.').pop()
+                const fileName = `${user.value.id}.${fileExt}`
+                const filePath = `${fileName}`
+
+                let { error: uploadError } = await supabase.storage
+                    .from('avatars')
+                    .upload(filePath, file, { upsert: true })
+
+                if (uploadError) throw uploadError
+
+                let { error } = await supabase
+                    .from('users')
+                    .update({ avatar_url: filePath }, {
+                        returning: 'minimal',
+                    })
+                    .eq('id', user.value.id)
+            }
+        } catch (uploadError) {
+            alert(uploadError.message)
+        }
         const updates = {
             nickname: nickname.value,
-            avatar_url: avatar_url.value,
         }
 
         let { error } = await supabase
             .from('users')
             .update(updates, {
                 returning: 'minimal',
-            }).eq('id', user.value.id)
+            })
+            .eq('id', user.value.id)
 
         if (error) throw error
     } catch (error) {
         alert(error.message)
     } finally {
         loading.value = false
+        window.location.reload(true)
     }
 }
+
+async function change_url(evt) {
+    files.value = evt.target.files
+}
+
+function validate_nickname() {
+    if (nickname.value.length < 3) {
+        nickname_valid_state.value = "is-invalid"
+    } else {
+        nickname_valid_state.value = "is-valid"
+    }
+    button_enabled()
+}
+
+function button_enabled() {
+    if (nickname_valid_state.value == "is-valid") {
+        btn_enabled.value = true
+    } else {
+        btn_enabled.value = false
+    }
+}
+
+watch(nickname, () => {
+    if (nickname_valid_state.value != "") {
+        validate_nickname()
+    }
+})
+
+
+const { data: posts, error } = await supabase
+    .from('posts')
+    .select('id')
+    .eq('author_id', user.value.id)
+    .order('created_at', { ascending: false })
+
+loaded.value = true
 </script>
 
 <template>
@@ -58,12 +120,13 @@ async function update_profile() {
                 <input class="form-control" id="email" type="text" :value="user.email" disabled />
             </div>
             <div class="mb-3">
-                <label class="form-label" for="nickname">Name</label>
-                <input class="form-control" id="nickname" type="text" v-model="nickname" />
+                <label class="form-label" for="nickname">Nickname</label>
+                <input class="form-control" id="nickname" type="text" v-model="nickname" :class="nickname_valid_state"
+                    @focusout="validate_nickname" />
             </div>
             <div class="mb-3">
-                <label class="form-label" for="website">Avatar URL</label>
-                <input class="form-control" id="website" type="website" v-model="avatar_url" />
+                <label class="form-label" for="website">Profile picture</label>
+                <input class="form-control form-control-sm" type="file" accept="image/*" @change="change_url">
             </div>
 
             <div v-if="loading">
@@ -73,8 +136,25 @@ async function update_profile() {
                 </button>
             </div>
             <div v-else class="mb-3">
-                <input v-if="btn_enabled" @click="update_profile" type="submit" class="btn btn-success" value="Update">
+                <input v-if="btn_enabled" type="submit" class="btn btn-success" value="Update">
+                <input v-else type="submit" class="btn btn-outline-success" value="Update" disabled>
             </div>
         </form>
+
+        <div>
+            <div v-if="loaded">
+                <h1>
+                    Your posts
+                </h1>
+                <div v-for="post in posts" :key="post.id">
+                    <LazyPost :id="post.id" />
+                </div>
+            </div>
+            <div v-else class="text-center">
+                <div class="spinner-border" role="status" style="width: 30rem; height: 30rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
     </div>
 </template>

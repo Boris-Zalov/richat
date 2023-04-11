@@ -2,6 +2,8 @@
 const { id } = defineProps(['id'])
 
 let loaded = ref(false)
+let avatar_src = ref('')
+let picture_src = ref('')
 
 const supabase = useSupabaseClient()
 
@@ -11,6 +13,30 @@ const { data: post, error: post_error } = await supabase
     .eq('id', id)
     .single()
 
+async function download_image() {
+    try {
+        const { data: avatar, error: downloadError } = await supabase.storage
+            .from('avatars')
+            .getPublicUrl(post.users.avatar_url)
+
+        if (downloadError) throw downloadError
+        avatar_src.value = avatar.publicUrl
+    } catch (downloadError) {
+        console.error('Error downloading image: ', downloadError.message)
+    }
+    try {
+        const { data: picture, error: pictureError } = await supabase.storage
+            .from('posts')
+            .getPublicUrl(post.img_url)
+
+        if (pictureError) throw pictureError
+        picture_src.value = picture.publicUrl
+    } catch (pictureError) {
+        console.error('Error downloading image: ', pictureError.message)
+    }
+}
+
+await download_image()
 loaded.value = true
 
 </script>
@@ -20,7 +46,7 @@ loaded.value = true
         <div v-if="loaded">
             <div class="card mt-5 p-2">
                 <div class="card-header d-flex align-items-center">
-                    <nuxt-img height="45" width="45" format="webp" quality="80" :src="post.users.avatar_url" alt=""
+                    <nuxt-img height="45" width="45" format="webp" quality="80" :src="avatar_src" alt=""
                         style="object-fit: cover;" class="rounded-circle m-3" sizes="sm:45 md:45 lg:45"
                         onerror="this.onerror=null;this.src='https:/\/cdn-icons-png.flaticon.com/512/149/149071.png';" />
                     <h3>{{ post.users.nickname }}</h3>
@@ -29,7 +55,7 @@ loaded.value = true
                     <div class="card-body">
                         <h5 class="card-title">{{ post.title }}</h5>
                         <p class="card-text">{{ post.text }}</p>
-                        <nuxt-img v-if="post.img_url" :src="post.img_url" class="img-fluid p-2" alt="" loading="lazy" />
+                        <nuxt-img v-if="post.img_url" :src="picture_src" class="img-fluid p-2" alt="" loading="lazy" />
                     </div>
                 </div>
 

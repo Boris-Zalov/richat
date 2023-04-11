@@ -6,6 +6,7 @@ let email = ref("")
 let password = ref("")
 let bio = ref("")
 let avatar_url = ref()
+let files = ref()
 
 let email_valid_state = ref("")
 let email_taken = ref(false)
@@ -44,7 +45,6 @@ async function validate_email() {
 function validate_password() {
     if (password.value.length < 6) {
         password_valid_state.value = "is-invalid"
-        console.log("asd")
     } else {
         password_valid_state.value = "is-valid"
     }
@@ -54,7 +54,6 @@ function validate_password() {
 function validate_nickname() {
     if (nickname.value.length < 3) {
         nickname_valid_state.value = "is-invalid"
-        console.log("asd")
     } else {
         nickname_valid_state.value = "is-valid"
     }
@@ -97,6 +96,29 @@ async function create_user() {
                 bio: data.user.user_metadata.bio
             })
         if (error) throw error
+
+        try {
+            const file = files.value[0]
+            const fileExt = file.name.split('.').pop()
+            const fileName = `${data.user.id}.${fileExt}`
+            const filePath = `${fileName}`
+
+            let { error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(filePath, file, { upsert: true })
+
+            if (uploadError) throw uploadError
+
+            let { error } = await supabase
+                .from('users')
+                .update({ avatar_url: filePath }, {
+                    returning: 'minimal',
+                })
+                .eq('id', data.user.id)
+        } catch (error) {
+            alert(error.message)
+        }
+
         registration_completed.value = true
     } catch (error) {
         alert(error.error_description || error.message)
@@ -104,6 +126,10 @@ async function create_user() {
         loading.value = false
     }
 
+}
+
+async function change_url(evt) {
+    files.value = evt.target.files
 }
 
 watch(email, () => {
@@ -156,8 +182,8 @@ watch(nickname, () => {
                 <div class="form-text">This is optional</div>
             </div>
             <div class="mb-3">
-                <label class="form-label">URL for your profile picture</label>
-                <input class="form-control" v-model="avatar_url">
+                <label class="form-label">Profile picture</label>
+                <input class="form-control form-control-sm" type="file" accept="image/*" @change="change_url">
                 <div class="form-text">This is optional</div>
             </div>
             <div v-if="loading">

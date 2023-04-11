@@ -68,8 +68,8 @@ async function log_in_otp() {
                     Signing up
                 </button>
             </div>
-            <div v-else class="mb-3 btn-group">
-                <input @click="log_in" type="submit" class="btn btn-success" value="Sign in"/>
+            <div v-else class="mb-3">
+                <input @click="log_in" type="submit" class="btn btn-success m-2" value="Sign in"/>
                 <button @click="log_in_otp" type="button" class="btn btn-success">Sign in using <i>One Time
                         Password</i></button>
             </div>
