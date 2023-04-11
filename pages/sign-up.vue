@@ -1,4 +1,10 @@
 <script setup>
+
+definePageMeta({
+  title: 'Richat | sign up'
+})
+
+
 const supabase = useSupabaseClient()
 
 let nickname = ref("")

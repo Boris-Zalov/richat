@@ -19,7 +19,7 @@ loaded.value = true
                 Home page
             </h1>
             <div v-for="post in data" :key="post.id">
-                <LazyPost :id="post.id" />
+                <LazyPost :id="post.id" :full="false"/>
             </div>
         </div>
         <div v-else class="text-center">

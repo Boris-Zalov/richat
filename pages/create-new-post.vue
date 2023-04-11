@@ -1,4 +1,9 @@
 <script setup>
+
+definePageMeta({
+  title: 'Richat | create post'
+})
+
 const user = useSupabaseUser()
 const supabase = useSupabaseClient()
 
