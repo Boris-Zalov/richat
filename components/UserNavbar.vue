@@ -24,8 +24,8 @@ async function signOut() {
 <template>
     <div>
         <NuxtLink to="/profile">
-            <nuxt-img height="45" width="45" format="webp" quality="80" :src="data[0].avatar_url" alt=""
-                style="object-fit: cover;" class="rounded-circle"
+            <nuxt-img height="45" width="45" sizes="sm:45 md:45 lg:45" format="webp" quality="80" :src="data[0].avatar_url"
+                alt="" style="object-fit: cover;" class="rounded-circle"
                 onerror="this.onerror=null;this.src='https:/\/cdn-icons-png.flaticon.com/512/149/149071.png';" />
             <a class="mx-3">{{ data[0].nickname }}</a>
         </NuxtLink>

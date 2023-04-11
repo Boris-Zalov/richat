@@ -11,7 +11,6 @@ const { data: post, error: post_error } = await supabase
     .eq('id', id)
     .single()
 
-console.log(post)
 loaded.value = true
 
 </script>
@@ -22,7 +21,7 @@ loaded.value = true
             <div class="card mt-5 p-2">
                 <div class="card-header d-flex align-items-center">
                     <nuxt-img height="45" width="45" format="webp" quality="80" :src="post.users.avatar_url" alt=""
-                        style="object-fit: cover;" class="rounded-circle m-3    "
+                        style="object-fit: cover;" class="rounded-circle m-3" sizes="sm:45 md:45 lg:45"
                         onerror="this.onerror=null;this.src='https:/\/cdn-icons-png.flaticon.com/512/149/149071.png';" />
                     <h3>{{ post.users.nickname }}</h3>
                 </div>
@@ -30,7 +29,7 @@ loaded.value = true
                     <div class="card-body">
                         <h5 class="card-title">{{ post.title }}</h5>
                         <p class="card-text">{{ post.text }}</p>
-                        <img :src="post.img_url" class="card-img-top img-fluid" style="width: min-content;" alt="">
+                        <nuxt-img v-if="post.img_url" :src="post.img_url" class="img-fluid p-2" alt="" loading="lazy" />
                     </div>
                 </div>
 

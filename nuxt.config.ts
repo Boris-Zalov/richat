@@ -29,7 +29,25 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxtjs/supabase',
-    '@nuxt/image-edge'
+    '@nuxt/image-edge',
+    '@kevinmarrec/nuxt-pwa',
+    '@averjs/nuxt-compression',
+    '@nuxt-modules/compression'
   ],
 
+  nitro: {
+    compressPublicAssets: {
+      brotli: true
+    },
+  },
+
+  pwa: {
+    workbox: {
+      enabled: true
+    },
+    manifest: {
+      name: 'Richat',
+      lang: 'en'
+    }
+  }
 })
