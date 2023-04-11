@@ -7,7 +7,7 @@ const user = useSupabaseUser()
         <nav class="navbar bg-body-tertiary navbar-expand-lg fixed-top shadow">
             <div class="container-fluid">
                 <NuxtLink to="/" class="navbar-brand">
-                    <img src="/favicon.ico" alt="Logo" class="d-inline-block align-text-top mx-1" />
+                    <nuxt-img src="/icon.png" format="webp" alt="Logo" class="d-inline-block align-text-top mx-1" />
                     Richat
                 </NuxtLink>
 

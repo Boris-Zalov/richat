@@ -32,13 +32,20 @@ export default defineNuxtConfig({
     '@nuxt/image-edge',
     '@kevinmarrec/nuxt-pwa',
     '@averjs/nuxt-compression',
-    '@nuxt-modules/compression'
+    '@nuxt-modules/compression',
+    'nuxt-delay-hydration'
   ],
 
   nitro: {
     compressPublicAssets: {
       brotli: true
     },
+  },
+
+  delayHydration: {
+    // enables nuxt-delay-hydration in dev mode for testing  
+    debug: process.env.NODE_ENV === 'development',
+    mode: 'init'
   },
 
   pwa: {
