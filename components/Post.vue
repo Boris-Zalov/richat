@@ -45,12 +45,13 @@ loaded.value = true
     <div>
         <div v-if="loaded">
             <div class="card mt-5 p-2">
-                <div class="card-header d-flex align-items-center">
-                    <nuxt-img height="35" width="35" format="webp" quality="80" :src="avatar_src" alt=""
+                <NuxtLink :to="'/user/' + post.author_id" class="card-header d-flex align-items-center link-light">
+                    <nuxt-img height="55" width="55" format="webp" quality="80" :src="avatar_src" alt=""
                         style="object-fit: cover;" class="rounded-circle m-3" sizes="sm:45 md:45 lg:45"
                         onerror="this.onerror=null;this.src='https:/\/cdn-icons-png.flaticon.com/512/149/149071.png';" />
                     <h5>{{ post.users.nickname }}</h5>
-                </div>
+                </NuxtLink>
+
                 <div class="text-center">
                     <div class="card-body">
                         <h2 v-if="full" class="card-title m-3">{{ post.title }}</h2>

@@ -5,6 +5,7 @@ const loading = ref(true)
 let loaded = ref(false)
 
 const nickname = ref('')
+const bio = ref('')
 const files = ref('')
 
 let nickname_valid_state = ref("")
@@ -16,12 +17,13 @@ const user = useSupabaseUser()
 
 let { data } = await supabase
     .from('users')
-    .select(`nickname`)
+    .select(`nickname, bio`)
     .eq('id', user.value.id)
     .single()
 
 if (data) {
     nickname.value = data.nickname
+    bio.value = data.bio
 }
 
 loading.value = false
@@ -56,6 +58,7 @@ async function update_profile() {
         }
         const updates = {
             nickname: nickname.value,
+            bio: bio.value
         }
 
         let { error } = await supabase
@@ -123,6 +126,10 @@ loaded.value = true
                 <label class="form-label" for="nickname">Nickname</label>
                 <input class="form-control" id="nickname" type="text" v-model="nickname" :class="nickname_valid_state"
                     @focusout="validate_nickname" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="nickname">About me</label>
+                <textarea class="form-control" rows="3" v-model="bio"></textarea>
             </div>
             <div class="mb-3">
                 <label class="form-label" for="website">Profile picture</label>
