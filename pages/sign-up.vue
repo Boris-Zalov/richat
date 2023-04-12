@@ -1,7 +1,7 @@
 <script setup>
 
 definePageMeta({
-  title: 'Richat | sign up'
+    title: 'Richat | sign up'
 })
 
 
@@ -11,7 +11,6 @@ let nickname = ref("")
 let email = ref("")
 let password = ref("")
 let bio = ref("")
-let avatar_url = ref()
 let files = ref()
 
 let email_valid_state = ref("")
@@ -78,6 +77,7 @@ function button_enabled() {
 async function create_user() {
     try {
         loading.value = true
+
         const { data } = await supabase.auth.signUp(
             {
                 email: email.value,
@@ -85,45 +85,38 @@ async function create_user() {
                 options: {
                     data: {
                         nickname: nickname.value,
-                        bio: bio.value,
-                        avatar_url: avatar_url.value
+                        bio: bio.value
                     }
                 }
             }
         )
-        let { error } = await supabase
-            .from('users')
-            .insert({
-                id: data.user.id,
-                email: data.user.email,
-                created_at: data.user.created_at,
-                avatar_url: data.user.user_metadata.avatar_url,
-                nickname: data.user.user_metadata.nickname,
-                bio: data.user.user_metadata.bio
-            })
-        if (error) throw error
-
+        let avatar_path = ''
         try {
             const file = files.value[0]
             const fileExt = file.name.split('.').pop()
             const fileName = `${data.user.id}.${fileExt}`
             const filePath = `${fileName}`
+            avatar_path = filePath
 
             let { error: uploadError } = await supabase.storage
                 .from('avatars')
                 .upload(filePath, file, { upsert: true })
 
             if (uploadError) throw uploadError
-
-            let { error } = await supabase
-                .from('users')
-                .update({ avatar_url: filePath }, {
-                    returning: 'minimal',
-                })
-                .eq('id', data.user.id)
         } catch (error) {
             alert(error.message)
         }
+        let { error } = await supabase
+            .from('users')
+            .insert({
+                id: data.user.id,
+                email: data.user.email,
+                created_at: data.user.created_at,
+                avatar_url: avatar_path,
+                nickname: data.user.user_metadata.nickname,
+                bio: data.user.user_metadata.bio
+            })
+        if (error) throw error
 
         registration_completed.value = true
     } catch (error) {
