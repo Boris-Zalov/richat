@@ -55,6 +55,11 @@ export default defineNuxtConfig({
     },
     manifest: {
       name: 'Richat',
+      short_name: 'Richat',
+      lang: 'en'
+    },
+    meta: {
+      title: 'Richat',
       lang: 'en'
     }
   },
