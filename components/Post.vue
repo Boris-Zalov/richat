@@ -89,6 +89,11 @@ async function count_likes() {
     like_count.value = likes.length
 }
 
+function copy_to_clipboard() {
+    navigator.clipboard.writeText('https://rkg-richat.netlify.app/post/' + id)
+    alert("Copied the URL for the post! ")
+}
+
 await count_likes()
 await download_image()
 await check_if_liked()
@@ -126,16 +131,21 @@ loaded.value = true
                         <nuxt-img v-if="post.img_url" :src="picture_src" class="img-fluid p-2" alt="" loading="lazy" />
                     </div>
                 </div>
-                <div v-if="user" class="card-footer d-flex align-items-center">
-                    <nuxt-img v-if="liked" src="icons/heart-fill.svg" height="25" width="25" class="filter-green m-2"
-                        quality="100" @click="update_likes" />
-                    <nuxt-img v-else src="icons/heart.svg" height="25" width="25" class="filter-green m-2" quality="100"
-                        @click="update_likes" />
-                    {{ like_count }}
-                </div>
-                <div v-else class="card-footer d-flex align-items-center">
-                    <nuxt-img src="icons/heart-fill.svg" height="25" width="25" class="filter-red m-2" quality="100" />
-                    {{ like_count }}
+                <div class="card-footer d-flex">
+                    <div v-if="user" class="w-100 align-items-center d-flex">
+                        <nuxt-img v-if="liked" src="icons/heart-fill.svg" height="25" width="25" class="filter-green m-2"
+                            quality="100" @click="update_likes" />
+                        <nuxt-img v-else src="icons/heart.svg" height="25" width="25" class="filter-green m-2" quality="100"
+                            @click="update_likes" />
+                        {{ like_count }}
+                    </div>
+                    <div v-else class="w-100 align-items-center d-flex">
+                        <nuxt-img src="icons/heart-fill.svg" height="25" width="25" class="filter-red m-2" quality="100" />
+                        {{ like_count }}
+                    </div>
+
+                    <nuxt-img src="icons/share-fill.svg" height="25" width="25" class="filter-green m-2 flex-shrink-1 "
+                        quality="100" @click="copy_to_clipboard" />
                 </div>
 
             </div>
