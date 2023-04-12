@@ -42,9 +42,6 @@ async function create_post() {
         alert(error.message)
     }
     await navigateTo('/')
-    if (error) {
-        alert(error)
-    }
 
 }
 
