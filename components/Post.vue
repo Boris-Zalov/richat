@@ -5,6 +5,10 @@ let loaded = ref(false)
 let avatar_src = ref('')
 let picture_src = ref('')
 
+let liked = ref(false)
+let like_count = ref(0)
+
+const user = useSupabaseUser()
 const supabase = useSupabaseClient()
 
 const { data: post, error: post_error } = await supabase
@@ -38,13 +42,64 @@ async function download_image() {
     }
 }
 
+async function check_if_liked() {
+    const { data: user_likes, error: user_likes_error } = await supabase
+        .from('post_likes')
+        .select()
+        .eq('author_id', post.author_id)
+        .eq('post_id', id)
+
+    if (user_likes.length > 0) {
+        liked.value = true
+    } else {
+        liked.value = false
+    }
+
+}
+
+
+async function update_likes() {
+    if (liked.value) {
+        const { data: l, error: e } = await supabase
+            .from('post_likes')
+            .delete()
+            .eq('author_id', post.author_id)
+            .eq('post_id', id)
+
+        liked.value = false
+    } else {
+        const { error: e } = await supabase
+            .from('post_likes')
+            .insert({
+                author_id: post.author_id,
+                post_id: id
+            })
+        liked.value = true
+    }
+
+    await count_likes()
+}
+
+async function count_likes() {
+    const { data: likes, error: likes_error } = await supabase
+        .from('post_likes')
+        .select('author_id')
+        .eq('post_id', id)
+
+    like_count.value = likes.length
+}
+
+await count_likes()
 await download_image()
+await check_if_liked()
+
 loaded.value = true
 
 </script>
 
 <template>
     <div>
+
         <div v-if="loaded">
             <div class="card mt-5 p-2">
                 <NuxtLink :to="'/user/' + post.author_id" class="card-header link-light d-flex ">
@@ -71,9 +126,30 @@ loaded.value = true
                         <nuxt-img v-if="post.img_url" :src="picture_src" class="img-fluid p-2" alt="" loading="lazy" />
                     </div>
                 </div>
+                <div v-if="user" class="card-footer d-flex align-items-center">
+                    <nuxt-img v-if="liked" src="icons/heart-fill.svg" height="25" width="25" class="filter-green m-2"
+                        quality="100" @click="update_likes" />
+                    <nuxt-img v-else src="icons/heart.svg" height="25" width="25" class="filter-green m-2" quality="100"
+                        @click="update_likes" />
+                    {{ like_count }}
+                </div>
+                <div v-else class="card-footer d-flex align-items-center">
+                    <nuxt-img src="icons/heart-fill.svg" height="25" width="25" class="filter-red m-2" quality="100" />
+                    {{ like_count }}
+                </div>
 
             </div>
         </div>
 
     </div>
 </template>
+
+<style>
+.filter-green {
+    filter: invert(39%) sepia(60%) saturate(533%) hue-rotate(100deg) brightness(94%) contrast(92%);
+}
+
+.filter-red {
+    filter: invert(29%) sepia(98%) saturate(1550%) hue-rotate(332deg) brightness(88%) contrast(97%);
+}
+</style>
