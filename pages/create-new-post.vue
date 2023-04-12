@@ -17,7 +17,8 @@ async function create_post() {
         .insert({
             title: title.value,
             text: text.value,
-            author_id: user.value.id
+            author_id: user.value.id,
+            created_at: new Date()  
         })
         .select()
         .single()

@@ -9,9 +9,11 @@ const supabase = useSupabaseClient()
 
 const { data: post, error: post_error } = await supabase
     .from('posts')
-    .select('title, text, img_url, author_id, users(avatar_url, nickname)')
+    .select('title, text, img_url, author_id, created_at, users(avatar_url, nickname)')
     .eq('id', id)
     .single()
+
+let creation_date = new Date(Date.parse(post.created_at))
 
 async function download_image() {
     try {
@@ -45,11 +47,18 @@ loaded.value = true
     <div>
         <div v-if="loaded">
             <div class="card mt-5 p-2">
-                <NuxtLink :to="'/user/' + post.author_id" class="card-header d-flex align-items-center link-light">
-                    <nuxt-img height="55" width="55" format="webp" quality="80" :src="avatar_src" alt=""
-                        style="object-fit: cover;" class="rounded-circle m-3" sizes="sm:45 md:45 lg:45"
-                        onerror="this.onerror=null;this.src='https:/\/cdn-icons-png.flaticon.com/512/149/149071.png';" />
-                    <h5>{{ post.users.nickname }}</h5>
+                <NuxtLink :to="'/user/' + post.author_id" class="card-header link-light d-flex ">
+                    <div class="w-100 align-items-center d-flex">
+                        <nuxt-img height="55" width="55" format="webp" quality="80" :src="avatar_src" alt=""
+                            style="object-fit: cover;" class="rounded-circle m-3" sizes="sm:45 md:45 lg:45"
+                            onerror="this.onerror=null;this.src='https:/\/cdn-icons-png.flaticon.com/512/149/149071.png';" />
+                        <h5>{{ post.users.nickname }}</h5>
+                    </div>
+                    <div class="flex-shrink-1 p-2">
+                        {{ creation_date.toLocaleDateString("en-GB") + ' ' + creation_date.getHours() + ":" +
+                            creation_date.getMinutes() }}
+                    </div>
+
                 </NuxtLink>
 
                 <div class="text-center">
