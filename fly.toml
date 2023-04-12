@@ -1,0 +1,10 @@
+# fly.toml file generated for richat on 2023-04-13T01:37:33+03:00
+
+app = "richat"
+primary_region = "lhr"
+
+[build]
+  builder = "heroku/buildpacks:20"
+
+[env]
+  PORT = "8080"
