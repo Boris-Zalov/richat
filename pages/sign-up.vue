@@ -77,7 +77,6 @@ function button_enabled() {
 async function create_user() {
     try {
         loading.value = true
-
         const { data } = await supabase.auth.signUp(
             {
                 email: email.value,
@@ -90,46 +89,46 @@ async function create_user() {
                 }
             }
         )
-        let avatar_path = ''
-        if (files.value) {
+        let { error } = await supabase
+            .from('users')
+            .insert({
+                id: data.user.id,
+                email: data.user.email,
+                created_at: data.user.created_at,
+                nickname: data.user.user_metadata.nickname,
+                bio: data.user.user_metadata.bio
+            })
+        if (error) throw error
+        try {
+            const file = files.value[0]
+            const fileExt = file.name.split('.').pop()
+            const fileName = `${data.user.id}.${fileExt}`
+            const filePath = `${fileName}`
+            let { error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(filePath, file, { upsert: true })
+            if (uploadError) throw uploadError
             try {
-                const file = files.value[0]
-                const fileExt = file.name.split('.').pop()
-                const fileName = `${data.user.id}.${fileExt}`
-                const filePath = `${fileName}`
-                avatar_path = filePath
-
-                let { error: uploadError } = await supabase.storage
-                    .from('avatars')
-                    .upload(filePath, file, { upsert: true })
-
-                if (uploadError) throw uploadError
-            } catch (error) {
-                alert(error.message)
+                let { e } = await supabase
+                    .from('users')
+                    .update({
+                        avatar_url: filePath
+                    })
+                    .eq('id', data.user.id)
+            } catch (e) {
+                console.log(error.message)
             }
-            let { error } = await supabase
-                .from('users')
-                .insert({
-                    id: data.user.id,
-                    email: data.user.email,
-                    created_at: data.user.created_at,
-                    avatar_url: avatar_path,
-                    nickname: data.user.user_metadata.nickname,
-                    bio: data.user.user_metadata.bio
-                })
-            if (error) throw error
+
+        } catch (error) {
+            console.log(error.message)
         }
-
-
         registration_completed.value = true
     } catch (error) {
-        alert(error.error_description || error.message)
+        console.log(error.error_description || error.message)
     } finally {
         loading.value = false
     }
-
 }
-
 async function change_url(evt) {
     files.value = evt.target.files
 }
