@@ -46,7 +46,7 @@ async function check_if_liked() {
     const { data: user_likes, error: user_likes_error } = await supabase
         .from('post_likes')
         .select()
-        .eq('author_id', post.author_id)
+        .eq('author_id', user.id)
         .eq('post_id', id)
 
     if (user_likes.length > 0) {
@@ -63,7 +63,7 @@ async function update_likes() {
         const { data: l, error: e } = await supabase
             .from('post_likes')
             .delete()
-            .eq('author_id', post.author_id)
+            .eq('author_id', user.id)
             .eq('post_id', id)
 
         liked.value = false
@@ -71,7 +71,7 @@ async function update_likes() {
         const { error: e } = await supabase
             .from('post_likes')
             .insert({
-                author_id: post.author_id,
+                author_id: user.id,
                 post_id: id
             })
         liked.value = true
