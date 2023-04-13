@@ -1,7 +1,8 @@
-# fly.toml file generated for richat on 2023-04-13T01:37:33+03:00
+# fly.toml file generated for richat on 2023-04-13T01:58:18+03:00
 
 app = "richat"
-primary_region = "lhr"
+kill_timeout = 0
+primary_region = "ams"
 
 [build]
   builder = "heroku/buildpacks:20"
