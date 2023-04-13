@@ -86,6 +86,13 @@ async function count_likes() {
         .eq('post_id', id)
 
     like_count.value = likes.length
+
+    let { e } = await supabase
+        .from('posts')
+        .update({
+            likes: like_count.value
+        })
+        .eq('id', id)
 }
 
 function copy_to_clipboard() {
