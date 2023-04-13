@@ -2,20 +2,25 @@
 const supabase = useSupabaseClient()
 
 const loading = ref(true)
-let loaded = ref(false)
+const loaded = ref(false)
+const changing = ref(false)
 
 const nickname = ref('')
 const bio = ref('')
 const files = ref('')
 
-let nickname_valid_state = ref("")
+const password = ref('')
+
+const nickname_valid_state = ref("")
+const password_valid_state = ref("")
 
 const btn_enabled = ref(true)
+const password_btn_enabled = ref(false)
 
 loading.value = true
 const user = useSupabaseUser()
 
-let { data } = await supabase
+const { data } = await supabase
     .from('users')
     .select(`nickname, bio`)
     .eq('id', user.value.id)
@@ -81,6 +86,13 @@ async function change_url(evt) {
     files.value = evt.target.files
 }
 
+async function change_password() {
+    changing.value = true
+    const { data, error } = await supabase.auth.updateUser({ password: password.value })
+    if (error) { alert(error) }
+    changing.value = false
+}
+
 function validate_nickname() {
     if (nickname.value.length < 3) {
         nickname_valid_state.value = "is-invalid"
@@ -90,11 +102,29 @@ function validate_nickname() {
     button_enabled()
 }
 
+function validate_password() {
+    if (password.value.length < 6) {
+        password_valid_state.value = "is-invalid"
+    } else {
+        password_valid_state.value = "is-valid"
+    }
+    password_button_enabled()
+}
+
+
 function button_enabled() {
     if (nickname_valid_state.value == "is-valid") {
         btn_enabled.value = true
     } else {
         btn_enabled.value = false
+    }
+}
+
+function password_button_enabled() {
+    if (password_valid_state.value == "is-valid") {
+        password_btn_enabled.value = true
+    } else {
+        password_btn_enabled.value = false
     }
 }
 
@@ -104,6 +134,11 @@ watch(nickname, () => {
     }
 })
 
+watch(password, () => {
+    if (password_valid_state.value != "") {
+        validate_password()
+    }
+})
 
 const { data: posts, error } = await supabase
     .from('posts')
@@ -116,7 +151,7 @@ loaded.value = true
 
 <template>
     <div>
-        <form class="form-widget" @submit.prevent="update_profile">
+        <form class="form-widget m-3" @submit.prevent="update_profile">
             <legend>Your profile</legend>
             <div class="mb-3">
                 <label class="form-label" for="email">Email</label>
@@ -146,6 +181,28 @@ loaded.value = true
                 <input v-if="btn_enabled" type="submit" class="btn btn-success" value="Update">
                 <input v-else type="submit" class="btn btn-outline-success" value="Update" disabled>
             </div>
+        </form>
+
+        <form @submit.prevent="change_password">
+            <legend>Change your password</legend>
+            <div class="mb-3">
+                <label class="form-label">New password</label>
+                <input type="password" class="form-control" v-model="password" @focusout="validate_password"
+                    :class="password_valid_state">
+                <div class="form-text">Must be at least 6 characters long</div>
+            </div>
+            <div v-if="changing">
+                <button class="btn btn-success" type="button" disabled>
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Changing
+                </button>
+            </div>
+            <div v-else class="mb-3">
+                <input v-if="password_btn_enabled" type="submit" class="btn btn-success" value="Change password">
+                <button v-else type="button" class="btn btn-outline-success" disabled>Change password</button>
+            </div>
+
+
         </form>
 
         <div>

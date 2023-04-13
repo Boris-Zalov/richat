@@ -46,7 +46,7 @@ loaded.value = true
                 :src="avatar_src" alt="" style="object-fit: cover;" class="rounded-circle" />
             <h1 class="mx-3">{{ user.nickname }}</h1>
         </div>
-        <p>{{ user.bio }}</p>
+        <p calss="m-4">{{ user.bio }}</p>
 
         <div v-if="posts">
             <h3>Posts made by {{ user.nickname }}:</h3>

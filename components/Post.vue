@@ -66,7 +66,6 @@ async function update_likes() {
             .eq('author_id', user.value.id)
             .eq('post_id', id)
 
-        liked.value = false
     } else {
         const { error: e } = await supabase
             .from('post_likes')
@@ -74,8 +73,8 @@ async function update_likes() {
                 author_id: user.value.id,
                 post_id: id
             })
-        liked.value = true
     }
+    liked.value = !liked.value
 
     await count_likes()
 }

@@ -91,32 +91,35 @@ async function create_user() {
             }
         )
         let avatar_path = ''
-        try {
-            const file = files.value[0]
-            const fileExt = file.name.split('.').pop()
-            const fileName = `${data.user.id}.${fileExt}`
-            const filePath = `${fileName}`
-            avatar_path = filePath
+        if (files.value) {
+            try {
+                const file = files.value[0]
+                const fileExt = file.name.split('.').pop()
+                const fileName = `${data.user.id}.${fileExt}`
+                const filePath = `${fileName}`
+                avatar_path = filePath
 
-            let { error: uploadError } = await supabase.storage
-                .from('avatars')
-                .upload(filePath, file, { upsert: true })
+                let { error: uploadError } = await supabase.storage
+                    .from('avatars')
+                    .upload(filePath, file, { upsert: true })
 
-            if (uploadError) throw uploadError
-        } catch (error) {
-            alert(error.message)
+                if (uploadError) throw uploadError
+            } catch (error) {
+                alert(error.message)
+            }
+            let { error } = await supabase
+                .from('users')
+                .insert({
+                    id: data.user.id,
+                    email: data.user.email,
+                    created_at: data.user.created_at,
+                    avatar_url: avatar_path,
+                    nickname: data.user.user_metadata.nickname,
+                    bio: data.user.user_metadata.bio
+                })
+            if (error) throw error
         }
-        let { error } = await supabase
-            .from('users')
-            .insert({
-                id: data.user.id,
-                email: data.user.email,
-                created_at: data.user.created_at,
-                avatar_url: avatar_path,
-                nickname: data.user.user_metadata.nickname,
-                bio: data.user.user_metadata.bio
-            })
-        if (error) throw error
+
 
         registration_completed.value = true
     } catch (error) {
