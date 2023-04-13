@@ -141,18 +141,18 @@ loaded.value = true
                 </div>
                 <div class="card-footer d-flex">
                     <div v-if="user" class="w-100 align-items-center d-flex">
-                        <nuxt-img v-if="liked" src="heart-fill.svg" height="25" width="25" class="filter-green m-2"
+                        <nuxt-img v-if="liked" src="icons/heart-fill.svg" height="25" width="25" class="filter-green m-2"
                             quality="100" @click="update_likes" />
-                        <nuxt-img v-else src="heart.svg" height="25" width="25" class="filter-green m-2" quality="100"
+                        <nuxt-img v-else src="icons/heart.svg" height="25" width="25" class="filter-green m-2" quality="100"
                             @click="update_likes" />
                         {{ like_count }}
                     </div>
                     <div v-else class="w-100 align-items-center d-flex">
-                        <nuxt-img src="heart-fill.svg" height="25" width="25" class="filter-red m-2" quality="100" />
+                        <nuxt-img src="icons/heart-fill.svg" height="25" width="25" class="filter-red m-2" quality="100" />
                         {{ like_count }}
                     </div>
 
-                    <nuxt-img src="share-fill.svg" height="25" width="25" class="filter-green m-2 flex-shrink-1 "
+                    <nuxt-img src="icons/share-fill.svg" height="25" width="25" class="filter-green m-2 flex-shrink-1 "
                         quality="100" @click="copy_to_clipboard" />
                 </div>
 
