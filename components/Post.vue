@@ -96,7 +96,7 @@ function copy_to_clipboard() {
 
 await count_likes()
 await download_image()
-if (user) {
+if (user.value) {
     await check_if_liked()
 }
 
